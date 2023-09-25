@@ -1,5 +1,6 @@
 using OneToMany.Domain;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace OneToMany.Data;//Återspeglar vart filen ligger
 
@@ -11,6 +12,7 @@ public class ApplicationDbContext : DbContext//Möjligör kommikationen med mode
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.LogTo(message => Debug.WriteLine(message));// se sql:n som genereras 
     }
     //Kunna prata med tabellen som skapades
     public DbSet<Project> Project { get; set; }

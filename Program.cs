@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
 using OneToMany.Data;
 using OneToMany.Domain;
 using static System.Console;
@@ -17,6 +18,7 @@ class Program
             WriteLine("1. Nytt projekt");
             WriteLine("2. Ny medlem");
             WriteLine("3. Bemanna projekt");
+            WriteLine("4. Lista projekt");
 
             var keyPressed = ReadKey(true); //hämtar in värdet
 
@@ -47,10 +49,63 @@ class Program
 
                     break;
 
+                case ConsoleKey.D4: //case för menyval1
+                case ConsoleKey.NumPad4:
+
+                    ListProjectsView();
+
+                    break;
+
             }
             Clear();
 
         }
+    }
+
+    private static void ListProjectsView()
+    {
+        var projects = GetProjects();// Får in alla projekt genom att anropa metoden som hämtar alla objekt
+
+        foreach (var project in projects)
+        {
+            WriteLine($"{project.Name} ({project.Deadline})");
+            WriteLine(new string('-', 60));
+
+            foreach (var member in project.Members)
+            {
+                WriteLine($" - {member.FirstName} {member.LastName}");
+            }
+        }
+
+        WaitUntilKeyPressed(ConsoleKey.Escape);
+    }
+
+
+    private static void WaitUntilKeyPressed(ConsoleKey key)
+    {
+        while (ReadKey(true).Key != key) ;
+    }
+
+    private static IEnumerable<Project> GetProjects()
+    {
+        using var context = new ApplicationDbContext();
+
+        // context.Project.ToList();
+        // SELECT Id, Name, Description, DueDate FROM Project
+
+        // context.Project.Include(x => x.Members).ToList()
+        // SELECT [p].[Id], [p].[Description], [p].[DueDate], [p].[Name], [t].[MembersId], [t].[ProjectsId], [t].[Id], [t].[Email], [t].[FirstName], [t].[LastName], [t].[Phone]
+        //   FROM [Project] AS [p]
+        //   LEFT JOIN (
+        //      SELECT [m].[MembersId], [m].[ProjectsId], [m0].[Id], [m0].[Email], [m0].[FirstName], [m0].[LastName], [m0].[Phone]
+        //           FROM [MemberProject] AS [m]
+        //       INNER JOIN [Member] AS [m0] ON [m].[MembersId] = [m0].[Id]
+        //   ) AS [t] ON [p].[Id] = [t].[ProjectsId]
+        //   ORDER BY [p].[Id], [t].[MembersId], [t].[ProjectsId]
+
+        //SQL-SELECT, Id, Name, Description, Deadline FROM Project - exakt detta gör koden nedan
+        //return context.Project.ToList();
+        return context.Project.Include(x => x.Members).ToList();
     }
 
     private static void ManProjectView()
