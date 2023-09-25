@@ -14,8 +14,9 @@ class Program
 
         while (true) //Loop som körs tills vi stänger ner den
         {
-            WriteLine("1. Registrera projekt");
-            WriteLine("2. Registrera medlem");
+            WriteLine("1. Nytt projekt");
+            WriteLine("2. Ny medlem");
+            WriteLine("3. Bemanna projekt");
 
             var keyPressed = ReadKey(true); //hämtar in värdet
 
@@ -38,10 +39,59 @@ class Program
 
                     break;
 
+
+                case ConsoleKey.D3: //case för menyval1
+                case ConsoleKey.NumPad3:
+
+                    ManProjectView();
+
+                    break;
+
             }
             Clear();
 
         }
+    }
+
+    private static void ManProjectView()
+    {
+        Write("E-post: ");
+
+        var email = ReadLine();
+
+        var member = FindMemberByEmail(email);
+
+        Clear();
+
+        Write("Projekt namn: ");
+
+        var projectName = ReadLine();
+
+        Clear();
+
+        using var context = new ApplicationDbContext();
+
+        context.Member.Attach(member); // fäster medlem ovan till contextet 
+
+        var project = context.Project.FirstOrDefault(x => x.Name == projectName); // plocka upp projektet baserat på medlemmens namn
+
+        project.Members.Add(member); // Lägger till medlemmedn till members  
+
+        context.SaveChanges(); // Detta kommer resultera i attt vi får en INSERT INTO för kopplingstabellen , dvs. vi skapar en koppling mellan projektet och medlemmen.
+
+        WriteLine("Medlem tillagd");
+
+        Thread.Sleep(2000);
+
+    }
+
+    private static Member? FindMemberByEmail(string? email)
+    {
+        using var context = new ApplicationDbContext();
+
+        return context.Member.FirstOrDefault(x => x.Email == email);
+
+
     }
 
     private static void RegisterMemberView()
@@ -72,22 +122,7 @@ class Program
 
         };
 
-        WriteLine("Vill du lägga till medlemmen till ett projekt? (J/N)");
-
-        var keyPressed = ReadKey(true);
-
-        if (keyPressed.Key == ConsoleKey.J)
-        {
-
-            WriteLine("Projekt (ID)");
-
-            var projectId = int.Parse(ReadLine()); // Hämta in projekt id
-
-            member.ProjectId = projectId;//Sätter projekt id på medlemmen 
-
-        }
-
-        SaveMember(member);//Metod som sparar information ovan
+        SaveMember(member);
 
         Clear();
 
@@ -95,6 +130,8 @@ class Program
 
         Thread.Sleep(2000);
     }
+
+
 
     private static void SaveMember(Member member)
     {

@@ -16,7 +16,7 @@ public class Project//Skapar upp en klass
     public required DateTime Deadline { get; set; }
 
     //Nacigation property 
-    public ICollection<Member> Members { get; set; }
+    public ICollection<Member> Members { get; set; } = new List <Member>(); // Skapar relationen mellan projekt och member
     //ICollection<Member>: Detta är typen av egenskapen. Det är en samling (collection) 
     //av objekt av typen Member. I detta fall antas det att Member är en annan klass i din databasmodell.
 

@@ -21,8 +21,10 @@ public class Member//Skapar upp en klass
 
     //ändra nullable till false i migrerigen - kommer inte kunna lägga till en medlem utan att tilldela medlemmen dirket till ett projekt.
 
-    public int ProjectId { get; set; }
+    //public int ProjectId { get; set; } // till många-till-en relation
 
+    //navigation property - en medlem kan ha många projekt. 
+    public ICollection<Project> Projects { get; set; } = new List<Project>(); // Skapar relationen mellan projekt och member - many-to-many koppling.
 
 
 }
